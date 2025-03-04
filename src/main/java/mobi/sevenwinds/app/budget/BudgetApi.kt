@@ -22,6 +22,9 @@ fun NormalOpenAPIRoute.budget() {
                 respond(BudgetService.getYearStats(param))
             }
         }
+        route("/author/add").post<Unit, AuthorDto, AuthorRequest>(info("Добавить автора")) { param, body ->
+            respond(AuthorService.addAuthor(body))
+        }
     }
 }
 
@@ -29,13 +32,23 @@ data class BudgetRecord(
     @Min(1900) val year: Int,
     @Min(1) @Max(12) val month: Int,
     @Min(1) val amount: Int,
-    val type: BudgetType
+    val type: BudgetType,
+    val author: AuthorDto? = null
 )
 
 data class BudgetYearParam(
     @PathParam("Год") val year: Int,
     @QueryParam("Лимит пагинации") val limit: Int,
     @QueryParam("Смещение пагинации") val offset: Int,
+    @QueryParam("Фильтр по ФИО автора") val authorName: String? = null
+)
+
+data class BudgetRequest(
+    @Min(1900) val year: Int,
+    @Min(1) @Max(12) val month: Int,
+    @Min(1) val amount: Int,
+    val type: BudgetType,
+    val authorId: Int? = null
 )
 
 class BudgetYearStatsResponse(
@@ -45,5 +58,5 @@ class BudgetYearStatsResponse(
 )
 
 enum class BudgetType {
-    Приход, Расход, Комиссия
+    Приход, Расход
 }
